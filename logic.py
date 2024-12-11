@@ -39,7 +39,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.button_channel7.clicked.connect(lambda: self.change_channel(7))
         self.button_channel8.clicked.connect(lambda: self.change_channel(8))
         self.button_channel9.clicked.connect(lambda: self.change_channel(9))
-        self.button_prevChannel.clicked.connect(lambda: self.change_channel(self.__prev_channel))
+        self.button_prevChannel.clicked.connect(lambda: self.previous_channel())
 
         self.label_chanImage = self.findChild(QLabel, "label_chanImage")
         self.label_chanImage.hide()
@@ -104,15 +104,15 @@ class Logic(QMainWindow, Ui_MainWindow):
                 self.__channel -= 1
             self.change_channel(self.__channel)
 
-    # def previous_channel(self) -> None:
-    #     """
-    #     Method that switches to the previously viewed channel
-    #     """
-    #     if self.__status and self.__prev_channel is not None:
-    #         # Swap current and previous channels
-    #         current_channel = self.__channel
-    #         self.change_channel(self.__prev_channel)
-    #         self.__prev_channel = current_channel
+    def previous_channel(self) -> None:
+        """
+        Method that switches to the previously viewed channel
+        """
+        if self.__status and self.__prev_channel is not None:
+            # Swap current and previous channels
+            current_channel = self.__channel
+            self.change_channel(self.__prev_channel)
+            self.__prev_channel = current_channel
 
     def change_channel(self, channel) -> None:
         """
