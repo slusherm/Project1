@@ -21,7 +21,8 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.__muted = False
         self.__volume = Logic.MIN_VOLUME
         self.__channel = Logic.MIN_CHANNEL
-        self.__prev_channel = None
+        self.__prev_channel = Logic.MIN_CHANNEL
+        self.__previous_volume = Logic.MIN_VOLUME
 
         self.button_power.clicked.connect(lambda: self.power())
         self.button_mute.clicked.connect(lambda: self.mute())
@@ -38,7 +39,8 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.button_channel7.clicked.connect(lambda: self.change_channel(7))
         self.button_channel8.clicked.connect(lambda: self.change_channel(8))
         self.button_channel9.clicked.connect(lambda: self.change_channel(9))
-        self.button_prevChannel.clicked.connect(lambda: self.previous_channel())
+        self.button_prevChannel.clicked.connect(lambda: self.change_channel(self.__prev_channel))
+
         self.label_chanImage = self.findChild(QLabel, "label_chanImage")
         self.label_chanImage.hide()
         self.slider_vol.setMinimum(Logic.MIN_VOLUME)
@@ -52,11 +54,13 @@ class Logic(QMainWindow, Ui_MainWindow):
         if self.__status:
             self.__status = False
             self.label_chanImage.hide()
+            self.slider_vol.setEnabled(False)
             self.button_power.setStyleSheet("color : red")
             self.button_mute.setStyleSheet("color : white")
         else:
             self.__status = True
             self.label_chanImage.show()
+            self.slider_vol.setEnabled(True)
             self.button_power.setStyleSheet("color : green")
             if self.__muted:
                 self.button_mute.setStyleSheet("color : red")
@@ -68,9 +72,11 @@ class Logic(QMainWindow, Ui_MainWindow):
         if self.__status:
             if self.__muted:
                 self.__muted = False
+                self.slider_vol.setValue(self.__previous_volume)
                 self.button_mute.setStyleSheet("color : white")
             else:
                 self.__muted = True
+                self.__previous_volume = self.slider_vol.value()
                 self.button_mute.setStyleSheet("color : red")
                 self.slider_vol.setValue(0)
 
@@ -98,15 +104,15 @@ class Logic(QMainWindow, Ui_MainWindow):
                 self.__channel -= 1
             self.change_channel(self.__channel)
 
-    def previous_channel(self) -> None:
-        """
-        Method that switches to the previously viewed channel
-        """
-        if self.__status and self.__prev_channel is not None:
-            # Swap current and previous channels
-            current_channel = self.__channel
-            self.change_channel(self.__prev_channel)
-            self.__prev_channel = current_channel
+    # def previous_channel(self) -> None:
+    #     """
+    #     Method that switches to the previously viewed channel
+    #     """
+    #     if self.__status and self.__prev_channel is not None:
+    #         # Swap current and previous channels
+    #         current_channel = self.__channel
+    #         self.change_channel(self.__prev_channel)
+    #         self.__prev_channel = current_channel
 
     def change_channel(self, channel) -> None:
         """
@@ -128,8 +134,9 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that turns the volume up by 1
         """
         if self.__status:
+            value = self.slider_vol.value()
             if self.__volume != Logic.MAX_VOLUME:
-                self.__volume = self.slider_vol.value()
+                self.__volume = value
                 self.__volume += 1
                 self.__muted = False
                 self.slider_vol.setValue(self.__volume)
@@ -140,8 +147,9 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that turns the volume down by 1
         """
         if self.__status:
+            value = self.slider_vol.value()
             if self.__volume != Logic.MIN_VOLUME:
-                self.__volume = self.slider_vol.value()
+                self.__volume = value
                 self.__volume -= 1
                 self.__muted = False
                 self.slider_vol.setValue(self.__volume)
