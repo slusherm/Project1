@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import *
 from gui import *
+import os
 
 class Logic(QMainWindow, Ui_MainWindow):
     """
@@ -20,7 +21,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.__muted = False
         self.__volume = Logic.MIN_VOLUME
         self.__channel = Logic.MIN_CHANNEL
-        self.button_power.setStyleSheet("color : red")
+        self.__prev_channel = None
 
         self.button_power.clicked.connect(lambda: self.power())
         self.button_mute.clicked.connect(lambda: self.mute())
@@ -37,10 +38,12 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.button_channel7.clicked.connect(lambda: self.change_channel(7))
         self.button_channel8.clicked.connect(lambda: self.change_channel(8))
         self.button_channel9.clicked.connect(lambda: self.change_channel(9))
+        self.button_prevChannel.clicked.connect(lambda: self.previous_channel())
         self.label_chanImage = self.findChild(QLabel, "label_chanImage")
         self.label_chanImage.hide()
         self.slider_vol.setMinimum(Logic.MIN_VOLUME)
         self.slider_vol.setMaximum(Logic.MAX_VOLUME)
+        self.button_power.setStyleSheet("color : red")
 
     def power(self) -> None:
         """
@@ -55,6 +58,8 @@ class Logic(QMainWindow, Ui_MainWindow):
             self.__status = True
             self.label_chanImage.show()
             self.button_power.setStyleSheet("color : green")
+            if self.__muted:
+                self.button_mute.setStyleSheet("color : red")
 
     def mute(self) -> None:
         """
@@ -67,13 +72,14 @@ class Logic(QMainWindow, Ui_MainWindow):
             else:
                 self.__muted = True
                 self.button_mute.setStyleSheet("color : red")
-                self.slider_vol.setValue(self.__volume)
+                self.slider_vol.setValue(0)
 
     def channel_up(self) -> None:
         """
         Method that sets the channel one higher
         """
         if self.__status:
+            self.__prev_channel = self.__channel
             if self.__channel == Logic.MAX_CHANNEL:
                 self.__channel = Logic.MIN_CHANNEL
             else:
@@ -85,11 +91,22 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that sets the channel one lower
         """
         if self.__status:
+            self.__prev_channel = self.__channel
             if self.__channel == Logic.MIN_CHANNEL:
                 self.__channel = Logic.MAX_CHANNEL
             else:
                 self.__channel -= 1
             self.change_channel(self.__channel)
+
+    def previous_channel(self) -> None:
+        """
+        Method that switches to the previously viewed channel
+        """
+        if self.__status and self.__prev_channel is not None:
+            # Swap current and previous channels
+            current_channel = self.__channel
+            self.change_channel(self.__prev_channel)
+            self.__prev_channel = current_channel
 
     def change_channel(self, channel) -> None:
         """
@@ -97,25 +114,14 @@ class Logic(QMainWindow, Ui_MainWindow):
         :param channel: Number of channel selected
         """
         if self.__status:
-            if channel == 1: #Netflix
-                self.label_chanImage.setPixmap(QtGui.QPixmap("chan1.png"))
-            if channel == 2: #HBO
-                self.label_chanImage.setPixmap(QtGui.QPixmap("chan2.png"))
-            if channel == 3: #CNN
-                self.label_chanImage.setPixmap(QtGui.QPixmap("chan3.png"))
-            if channel == 4: #PBS Kids
-                self.label_chanImage.setPixmap(QtGui.QPixmap("chan4.png"))
-            if channel == 5: #Cartoon Network
-                self.label_chanImage.setPixmap(QtGui.QPixmap("chan5.png"))
-            if channel == 6: #WOWT News
-                self.label_chanImage.setPixmap(QtGui.QPixmap("chan6.png"))
-            if channel == 7: #Animal Planet
-                self.label_chanImage.setPixmap(QtGui.QPixmap("chan7.png"))
-            if channel == 8: #HGTV
-                self.label_chanImage.setPixmap(QtGui.QPixmap("chan8.png"))
-            if channel == 9: #Food Network
-                self.label_chanImage.setPixmap(QtGui.QPixmap("chan9.png"))
+            # Update the previous channel before switching
+            self.__prev_channel = self.__channel
+            self.__channel = channel
 
+            # Set the corresponding image
+            file_path = f"chan{channel}.png"
+            if os.path.exists(file_path):
+                self.label_chanImage.setPixmap(QtGui.QPixmap(file_path))
 
     def volume_up(self) -> None:
         """
@@ -123,11 +129,11 @@ class Logic(QMainWindow, Ui_MainWindow):
         """
         if self.__status:
             if self.__volume != Logic.MAX_VOLUME:
+                self.__volume = self.slider_vol.value()
                 self.__volume += 1
                 self.__muted = False
                 self.slider_vol.setValue(self.__volume)
                 self.button_mute.setStyleSheet("color : white")
-
 
     def volume_down(self) -> None:
         """
@@ -135,6 +141,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         """
         if self.__status:
             if self.__volume != Logic.MIN_VOLUME:
+                self.__volume = self.slider_vol.value()
                 self.__volume -= 1
                 self.__muted = False
                 self.slider_vol.setValue(self.__volume)
