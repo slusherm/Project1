@@ -40,6 +40,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.button_channel8.clicked.connect(lambda: self.change_channel(8))
         self.button_channel9.clicked.connect(lambda: self.change_channel(9))
         self.button_prevChannel.clicked.connect(lambda: self.previous_channel())
+        #self.slider_vol.mouseReleaseEvent(self.slider_changed())
 
         self.label_chanImage = self.findChild(QLabel, "label_chanImage")
         self.label_chanImage.hide()
@@ -79,6 +80,11 @@ class Logic(QMainWindow, Ui_MainWindow):
                 self.__previous_volume = self.slider_vol.value()
                 self.button_mute.setStyleSheet("color : red")
                 self.slider_vol.setValue(0)
+
+    # def slider_changed(self) -> None:
+    #     if self.__status:
+    #         if self.__muted:
+    #             self.mute()
 
     def channel_up(self) -> None:
         """
@@ -134,12 +140,14 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that turns the volume up by 1
         """
         if self.__status:
-            value = self.slider_vol.value()
             if self.__volume != Logic.MAX_VOLUME:
-                self.__volume = value
+                self.__volume = self.slider_vol.value()
                 self.__volume += 1
-                self.__muted = False
-                self.slider_vol.setValue(self.__volume)
+                if self.__muted:
+                    self.slider_vol.setValue(self.__previous_volume + 1)
+                    self.__muted = False
+                else:
+                    self.slider_vol.setValue(self.__volume)
                 self.button_mute.setStyleSheet("color : white")
 
     def volume_down(self) -> None:
@@ -147,20 +155,12 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that turns the volume down by 1
         """
         if self.__status:
-            value = self.slider_vol.value()
             if self.__volume != Logic.MIN_VOLUME:
-                self.__volume = value
+                self.__volume = self.slider_vol.value()
                 self.__volume -= 1
-                self.__muted = False
-                self.slider_vol.setValue(self.__volume)
+                if self.__muted:
+                    self.slider_vol.setValue(self.__previous_volume - 1)
+                    self.__muted = False
+                else:
+                    self.slider_vol.setValue(self.__volume)
                 self.button_mute.setStyleSheet("color : white")
-
-    def __str__(self) -> str:
-        """
-        Method that prints the current TV settings
-        :return: TV's current settings for power, channel, and volume
-        """
-        if self.__muted:
-            return f'Power = {self.__status}, Channel = {self.__channel}, Volume = {Logic.MIN_VOLUME}'
-        else:
-            return f'Power = {self.__status}, Channel = {self.__channel}, Volume = {self.__volume}'
