@@ -71,7 +71,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that mutes or unmutes the TV
         """
         if self.__status:
-            if self.__muted and self.slider_vol.value() =git add -u .idea/= 0:
+            if self.__muted and self.slider_vol.value() == 0:
                 self.__muted = False
                 self.slider_vol.setValue(self.__previous_volume)
                 self.button_mute.setStyleSheet("color : white")
