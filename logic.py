@@ -40,7 +40,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.button_channel8.clicked.connect(lambda: self.change_channel(8))
         self.button_channel9.clicked.connect(lambda: self.change_channel(9))
         self.button_prevChannel.clicked.connect(lambda: self.previous_channel())
-        #self.slider_vol.mouseReleaseEvent(self.slider_changed())
+        self.slider_vol.sliderReleased.connect(lambda: self.slider_released())
 
         self.label_chanImage = self.findChild(QLabel, "label_chanImage")
         self.label_chanImage.hide()
@@ -71,20 +71,26 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that mutes or unmutes the TV
         """
         if self.__status:
-            if self.__muted:
+            if self.__muted and self.slider_vol.valueChanged != 0:
                 self.__muted = False
                 self.slider_vol.setValue(self.__previous_volume)
                 self.button_mute.setStyleSheet("color : white")
             else:
                 self.__muted = True
                 self.__previous_volume = self.slider_vol.value()
-                self.button_mute.setStyleSheet("color : red")
                 self.slider_vol.setValue(0)
+                self.button_mute.setStyleSheet("color : red")
 
-    # def slider_changed(self) -> None:
-    #     if self.__status:
-    #         if self.__muted:
-    #             self.mute()
+    def slider_released(self) -> None:
+        """
+        Handles volume slider changes and unmutes if muted.
+        """
+        if self.__status:  # Ensure the TV is on
+            if self.__muted:  # If muted, unmute
+                self.__muted = False
+                self.button_mute.setStyleSheet("color : white")
+            # Update the volume
+            self.__volume = self.slider_vol.value()
 
     def channel_up(self) -> None:
         """
@@ -127,7 +133,8 @@ class Logic(QMainWindow, Ui_MainWindow):
         """
         if self.__status:
             # Update the previous channel before switching
-            self.__prev_channel = self.__channel
+            if self.__prev_channel == self.__channel:
+                self.__prev_channel = self.__channel
             self.__channel = channel
 
             # Set the corresponding image
