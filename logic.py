@@ -19,7 +19,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.__status = False
         self.__muted = False
-        self.__volume = Logic.MIN_VOLUME
+        self.__volume = self.slider_vol.value()
         self.__channel = Logic.MIN_CHANNEL
         self.__prev_channel = Logic.MIN_CHANNEL
         self.__previous_volume = Logic.MIN_VOLUME
@@ -71,7 +71,7 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that mutes or unmutes the TV
         """
         if self.__status:
-            if self.__muted and self.slider_vol.valueChanged != 0:
+            if self.__muted and self.slider_vol.value() != 0:
                 self.__muted = False
                 self.slider_vol.setValue(self.__previous_volume)
                 self.button_mute.setStyleSheet("color : white")
@@ -100,9 +100,10 @@ class Logic(QMainWindow, Ui_MainWindow):
             self.__prev_channel = self.__channel
             if self.__channel == Logic.MAX_CHANNEL:
                 self.__channel = Logic.MIN_CHANNEL
+                self.set_image(self.__channel)
             else:
                 self.__channel += 1
-            self.change_channel(self.__channel)
+                self.set_image(self.__channel)
 
     def channel_down(self) -> None:
         """
@@ -112,9 +113,10 @@ class Logic(QMainWindow, Ui_MainWindow):
             self.__prev_channel = self.__channel
             if self.__channel == Logic.MIN_CHANNEL:
                 self.__channel = Logic.MAX_CHANNEL
+                self.set_image(self.__channel)
             else:
                 self.__channel -= 1
-            self.change_channel(self.__channel)
+                self.set_image(self.__channel)
 
     def previous_channel(self) -> None:
         """
@@ -123,7 +125,8 @@ class Logic(QMainWindow, Ui_MainWindow):
         if self.__status and self.__prev_channel is not None:
             # Swap current and previous channels
             current_channel = self.__channel
-            self.change_channel(self.__prev_channel)
+            self.set_image(self.__prev_channel)
+            self.__channel = self.__prev_channel
             self.__prev_channel = current_channel
 
     def change_channel(self, channel) -> None:
@@ -132,12 +135,13 @@ class Logic(QMainWindow, Ui_MainWindow):
         :param channel: Number of channel selected
         """
         if self.__status:
-            # Update the previous channel before switching
-            if self.__prev_channel == self.__channel:
-                self.__prev_channel = self.__channel
+            self.__prev_channel = self.__channel
             self.__channel = channel
+            self.set_image(self.__channel)
 
-            # Set the corresponding image
+    def set_image(self, channel):
+        # Set the corresponding image
+        if self.__status:
             file_path = f"chan{channel}.png"
             if os.path.exists(file_path):
                 self.label_chanImage.setPixmap(QtGui.QPixmap(file_path))
