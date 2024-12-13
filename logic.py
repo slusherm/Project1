@@ -52,14 +52,14 @@ class Logic(QMainWindow, Ui_MainWindow):
         """
         Method that sets the TV either on or off
         """
-        if self.__status:
+        if self.__status: #Turn TV "off" and set corresponding features
             self.__status = False
             self.label_chanImage.hide()
             self.slider_vol.setEnabled(False)
             self.button_power.setStyleSheet("color : red")
             self.button_mute.setStyleSheet("color : white")
         else:
-            self.__status = True
+            self.__status = True #Turn TV "on" and set corresponding features
             self.label_chanImage.show()
             self.slider_vol.setEnabled(True)
             self.button_power.setStyleSheet("color : green")
@@ -71,17 +71,17 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that mutes or unmutes the TV
         """
         if self.__status:
-            if self.__muted and self.slider_vol.value() == 0:
+            if self.__muted and self.slider_vol.value() == 0: #Unmutes TV
                 self.__muted = False
                 self.slider_vol.setValue(self.__previous_volume)
                 self.button_mute.setStyleSheet("color : white")
-            else:
+            else: #Mutes TV
                 self.__muted = True
                 self.__previous_volume = self.slider_vol.value()
                 self.slider_vol.setValue(0)
                 self.button_mute.setStyleSheet("color : red")
 
-    def slider_released(self) -> None:
+    def slider_released(self) -> None: #Handles volume when slider is clicked
         """
         Handles volume slider changes and unmutes if muted.
         """
@@ -97,11 +97,11 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that sets the channel one higher
         """
         if self.__status:
-            self.__prev_channel = self.__channel
-            if self.__channel == Logic.MAX_CHANNEL:
+            self.__prev_channel = self.__channel #Updates previous channel variable
+            if self.__channel == Logic.MAX_CHANNEL: #Wraps channel and calls image function
                 self.__channel = Logic.MIN_CHANNEL
                 self.set_image(self.__channel)
-            else:
+            else: #Sets channel value 1 higher and calls image function
                 self.__channel += 1
                 self.set_image(self.__channel)
 
@@ -110,11 +110,11 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that sets the channel one lower
         """
         if self.__status:
-            self.__prev_channel = self.__channel
-            if self.__channel == Logic.MIN_CHANNEL:
+            self.__prev_channel = self.__channel #Updates previous channel variable
+            if self.__channel == Logic.MIN_CHANNEL: #Wraps channel and calls image function
                 self.__channel = Logic.MAX_CHANNEL
                 self.set_image(self.__channel)
-            else:
+            else: #Sets channel value 1 lower and calls image function
                 self.__channel -= 1
                 self.set_image(self.__channel)
 
@@ -129,7 +129,7 @@ class Logic(QMainWindow, Ui_MainWindow):
             self.__channel = self.__prev_channel
             self.__prev_channel = current_channel
 
-    def change_channel(self, channel) -> None:
+    def change_channel(self, channel) -> None: #Handles channel change with numerical buttons
         """
         Method that sets the channel number to the corresponding image
         :param channel: Number of channel selected
@@ -139,7 +139,7 @@ class Logic(QMainWindow, Ui_MainWindow):
             self.__channel = channel
             self.set_image(self.__channel)
 
-    def set_image(self, channel):
+    def set_image(self, channel): #Changes image for all channel buttons
         # Set the corresponding image
         if self.__status:
             file_path = f"chan{channel}.png"
@@ -151,13 +151,13 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that turns the volume up by 1
         """
         if self.__status:
-            if self.__volume != Logic.MAX_VOLUME:
+            if self.__volume != Logic.MAX_VOLUME: #Increases volume
                 self.__volume = self.slider_vol.value()
                 self.__volume += 1
-                if self.__muted:
+                if self.__muted: #unmutes if muted and updates volume
                     self.slider_vol.setValue(self.__previous_volume + 1)
                     self.__muted = False
-                else:
+                else: #updates volume
                     self.slider_vol.setValue(self.__volume)
                 self.button_mute.setStyleSheet("color : white")
 
@@ -166,12 +166,12 @@ class Logic(QMainWindow, Ui_MainWindow):
         Method that turns the volume down by 1
         """
         if self.__status:
-            if self.__volume != Logic.MIN_VOLUME:
+            if self.__volume != Logic.MIN_VOLUME: #Decreases volume
                 self.__volume = self.slider_vol.value()
                 self.__volume -= 1
-                if self.__muted:
+                if self.__muted: #Unmutes if muted and updates volume
                     self.slider_vol.setValue(self.__previous_volume - 1)
                     self.__muted = False
-                else:
+                else: #updates volume
                     self.slider_vol.setValue(self.__volume)
                 self.button_mute.setStyleSheet("color : white")
