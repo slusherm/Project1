@@ -139,8 +139,11 @@ class Logic(QMainWindow, Ui_MainWindow):
             self.__channel = channel
             self.set_image(self.__channel)
 
-    def set_image(self, channel): #Changes image for all channel buttons
-        # Set the corresponding image
+    def set_image(self, channel) -> None:
+        """
+        Method that sets the image for each channel
+        :param channel: Number corresponding to channel image
+        """
         if self.__status:
             file_path = f"chan{channel}.png"
             if os.path.exists(file_path):
