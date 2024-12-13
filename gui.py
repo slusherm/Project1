@@ -200,7 +200,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "TV Remote"))
         self.button_power.setText(_translate("MainWindow", "Power"))
         self.button_channel5.setText(_translate("MainWindow", "5"))
         self.button_channel9.setText(_translate("MainWindow", "9"))
